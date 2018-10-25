@@ -17,8 +17,8 @@
   <ion-card>
 
     <ion-item class="mainData">
-      <ion-img class="heightTanque" id="tanque" width="34" height="50" src="assets/img/NivelesTanque/nivel3.png" float-left></ion-img>
-      <ion-img class="heightTanque" id="tanque1" width="34" height="50" src="assets/img/NivelesTanque/nivel3.png" float-right></ion-img>
+      <ion-img class="heightTanque" id="tanque" width="34" height="50" [src]="pathImageNivel1" float-left></ion-img>
+      <ion-img class="heightTanque" id="tanque1" width="34" height="50"[src]="pathImageNivel2" float-right></ion-img>
     </ion-item>
 
     <ion-item class="mainData">
@@ -36,27 +36,27 @@
   <ion-list>
     <ion-item>
       <ion-label>Manual</ion-label>
-      <ion-toggle [(ngModel)]="isManualChecked" disabled="isManualEnable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isManualChecked" [disabled]="isManualDisable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Bomba</ion-label>
-      <ion-toggle [(ngModel)]="isBombaChecked" disabled="isBombaEnable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isBombaChecked" [disabled]="isBombaDisable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 1 </ion-label>
-      <ion-toggle [(ngModel)]="isValvula1Checked" disabled="isValvula1Enable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula1Checked" [disabled]="isValvula1Disable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 2</ion-label>
-      <ion-toggle [(ngModel)]="isValvula2Checked" disabled="isValvula2Enable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula2Checked" [disabled]="isValvula2Disable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 3</ion-label>
-      <ion-toggle [(ngModel)]="isValvula3Checked" disabled="isValvula3Enable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula3Checked" [disabled]="isValvula3Disable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Servidor</ion-label>
-      <ion-toggle [(ngModel)]="isServidorChecked" disabled="isServidorEnable"></ion-toggle>
+      <ion-toggle [(ngModel)]="isServidorChecked" [disabled]="isServidorDisable"></ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>
