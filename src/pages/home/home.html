@@ -36,27 +36,27 @@
   <ion-list>
     <ion-item>
       <ion-label>Manual</ion-label>
-      <ion-toggle [(ngModel)]="isManualChecked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isManualChecked" disabled="isManualEnable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Bomba</ion-label>
-      <ion-toggle [(ngModel)]="isBombaChecked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isBombaChecked" disabled="isBombaEnable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 1 </ion-label>
-      <ion-toggle [(ngModel)]="isValvula1Checked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula1Checked" disabled="isValvula1Enable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 2</ion-label>
-      <ion-toggle [(ngModel)]="isValvula2Checked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula2Checked" disabled="isValvula2Enable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Valvula 3</ion-label>
-      <ion-toggle [(ngModel)]="isValvula3Checked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isValvula3Checked" disabled="isValvula3Enable"></ion-toggle>
     </ion-item>
     <ion-item>
       <ion-label>Servidor</ion-label>
-      <ion-toggle [(ngModel)]="isServidorChecked"></ion-toggle>
+      <ion-toggle [(ngModel)]="isServidorChecked" disabled="isServidorEnable"></ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>
