@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { NavController } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
+import { FUNCTION_TYPE } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'page-home',
@@ -19,56 +20,43 @@ export class HomePage {
                                               "assets/img/NivelesTanque/nivel4.png",
                                               "assets/img/NivelesTanque/nivel5.png"];
 
-  public isManualChecked: boolean;
-  public isBombaChecked: boolean;
-  public isValvula1Checked: boolean;
-  public isValvula2Checked: boolean;
-  public isValvula3Checked: boolean;
-  public isServidorChecked: boolean;
+  public optionsList: Array<string> = ["bomba", "valvula1", "valvula2", "valvula3", "RcvParametros", "manual", "servidor"];
+  public nivelOptionsList: Array<string> = ["nivel1", "nivel2"];
+  public numericOptionsList: string[] = new Array(); 
 
-  public isManualDisable: boolean;
-  public isBombaDisable: boolean;
-  public isValvula1Disable: boolean;
-  public isValvula2Disable: boolean;
-  public isValvula3Disable: boolean;
-  public isServidorDisable: boolean;
+  public estadosdict: { [key: string]: number; } = {};
 
-  public distancia1: number;
-  public distancia2: number;
-  public altura1: number;
-  public altura2: number;
-  public nivel1: string;
-  public nivel2: string;
+  public checkedDict: { [key: string]: boolean; } = {};
+  public disableDict: { [key: string]: boolean; } = {};
 
-  public pathImageNivel1: string;
-  public pathImageNivel2: string;
-  
-  
+  public numericOpDict: { [key: string]: number; } = {};
+  public nivelDict: { [key: string]: string; } = {};
+
+  public nivelViewList: string[] = new Array();    
 
   constructor(navCtrl: NavController, toastCtrl: ToastController) {
     this.webSocket = new WebSocket('ws://192.168.0.6:3000/rasp');
     this._toastCtrl = toastCtrl;
-    this.isManualChecked = false;
-    this.isBombaChecked = false;
-    this.isValvula1Checked = false;
-    this.isValvula2Checked = false;
-    this.isValvula3Checked = false;
-    this.isServidorChecked = false;
 
-    this.isManualDisable = true;
-    this.isBombaDisable = true;
-    this.isValvula1Disable = true;
-    this.isValvula2Disable = true;
-    this.isValvula3Disable = true;
-    this.isServidorDisable = true;
-
-
-    this.distancia1 = 0;
-    this.distancia2 = 0;
-    this.altura1 = 0;
-    this.altura2 = 0;
-    this.nivel1 = this.getTextNivel(1); // Parameter 1:nivel1 ; 2:nivel2
-    this.nivel2 = this.getTextNivel(2);
+    for (let option in this.optionsList) {
+      this.checkedDict[this.optionsList[option]] = false;
+      this.disableDict[this.optionsList[option]] = true;
+    }    
+    
+    for (let option in this.nivelOptionsList) this.numericOptionsList.push("altura" + this.getNumberLevel(this.nivelOptionsList[option]));          
+    
+    for (let option in this.nivelOptionsList) this.numericOptionsList.push("distancia" + this.getNumberLevel(this.nivelOptionsList[option]));            
+        
+    for (let option in this.numericOptionsList) this.numericOpDict[this.numericOptionsList[option]] = 0;    
+    for (let option in this.nivelOptionsList)
+    {
+      this.nivelDict[this.nivelOptionsList[option]] = this.getTextNivel(this.nivelOptionsList[option]);      
+      this.nivelViewList.push(this.listImagesNivel[0]);
+    }    
+    
+    var increment: number = 0;
+    var allOptions: string[] = this.getAllOptions();
+    for (let option in allOptions) this.estadosdict[allOptions[option]] = increment++;
 
     this.changeImageTanque();
 
@@ -77,54 +65,46 @@ export class HomePage {
       setTimeout(() => self.checkServer(), 5000);
       console.log('open');
       this.send('hello');         // transmit "hello" after connecting
-    };
+    };    
+
   }
 
-  getTextNivel(nivel: number): string {
-    switch (nivel) {
-      case 1: {
-        return (this.distancia1 as any as string) + "/" + (this.altura1 as any as string);        
-      }
-      case 2: {
-        return (this.distancia2 as any as string) + "/" + (this.altura2 as any as string);                
-      }
-    }
-    return "0/0";
+  getTextNivel(nivel: string): string {    
+    return (this.numericOpDict["distancia" + this.getNumberLevel(nivel)] as any as string) + "/" + (this.numericOpDict["altura" + this.getNumberLevel(nivel)] as any as string); 
   }
 
-  checkServer() {
+  checkServer() {       
+    if (this.webSocket == undefined || this.webSocket.readyState === this.webSocket.CLOSED) this.checkedDict["servidor"] = false;
+    else this.checkedDict["servidor"] = true;
+  }
+
+  getNumberLevel(nivel:string): string{
+    return nivel.replace("nivel", "");
+  }
+
+  getAllOptions(): Array<string> {
+    return this.numericOptionsList.concat(this.optionsList)
+  }
+
+  changeImageTanque() {    
+    var porcetajesList: number[] = new Array();
     
-    //this.isServidorDisable = false;
-    if (this.webSocket == undefined || this.webSocket.readyState === this.webSocket.CLOSED) this.isServidorChecked = false;
-    else this.isServidorChecked = true;
-    //this.isServidorDisable = true;
-
-
+    for (let option in this.nivelOptionsList) {
+      var numberOption: string = this.getNumberLevel(this.nivelOptionsList[option]);      
+      this.numericOpDict["altura" + numberOption] = ( this.numericOpDict["altura" + numberOption] == undefined ||
+        this.numericOpDict["altura" + numberOption] == 0) ? 1 : this.numericOpDict["altura" + numberOption];      
+      
+      porcetajesList.push(this.numericOpDict["distancia" + numberOption] / this.numericOpDict["altura" + numberOption]);
+    }
+    
+    var temp: number;
+    for (var i: number = 0; i < porcetajesList.length; i++) {      
+      if (porcetajesList[i] > 0.9999) porcetajesList[i] = 0.9999;
+      porcetajesList[i] = 0.9999 - porcetajesList[i];
+      temp = Math.floor(porcetajesList[i] * this.listImagesNivel.length);
+      this.nivelViewList[i] = this.listImagesNivel[temp];      
+    }    
   }
-
-
-  changeImageTanque() {
-    //listImagesNivel
-    this.altura1 = (this.altura1 == undefined || this.altura1 == 0) ? 1 : this.altura1;
-    this.altura2 = (this.altura2 == undefined || this.altura2 == 0) ? 1 : this.altura2;
-
-    let alturaPorcentaje1: number = this.distancia1 / this.altura1;
-    let alturaPorcentaje2: number = this.distancia2 / this.altura2;
-
-    if (alturaPorcentaje1 > 0.9999) alturaPorcentaje1 = 0.9999;
-    if (alturaPorcentaje2 > 0.9999) alturaPorcentaje2 = 0.9999;
-
-    alturaPorcentaje1 = 0.9999 - alturaPorcentaje1;
-    alturaPorcentaje2 = 0.9999 - alturaPorcentaje2;
-
-    let numberImage1: number = alturaPorcentaje1 * this.listImagesNivel.length;
-    let numberImage2: number = alturaPorcentaje2 * this.listImagesNivel.length;
-
-    this.pathImageNivel1 = this.listImagesNivel[parseInt(numberImage1)];
-    this.pathImageNivel2 = this.listImagesNivel[parseInt(numberImage2)];
-  }
-
-
 
   showToast(position: string) {
     let toast = this._toastCtrl.create({
