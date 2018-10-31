@@ -59,14 +59,37 @@ export class HomePage {
     for (let option in allOptions) this.estadosdict[allOptions[option]] = increment++;
 
     this.changeImageTanque();
+    this.getCurrentEstados();
 
     var self = this;
     this.webSocket.onopen = function () {
       setTimeout(() => self.checkServer(), 5000);
       console.log('open');
       this.send('hello');         // transmit "hello" after connecting
+    };
+
+
+    this.webSocket.onmessage = function (event) {
+      //var previousEstados: Array<string> = self.getCurrentEstados().split(",");
+      //var currentEstados: Array<string> = event.data.split(",");
+
+      //setTimeout(() => self.checkServer(), 5000);
+      //console.log('open');
+      //this.send('hello');         // transmit "hello" after connecting
     };    
 
+  }
+  getCurrentEstados() : string{
+    var currentEstados: string = "";
+    for (var estado in this.estadosdict) {
+      currentEstados += ","
+      if (estado.includes("distancia") || estado.includes("altura")) currentEstados += this.estadosdict[estado];
+      else {
+        if (this.checkedDict[estado]) currentEstados += "ON";
+        else currentEstados += "OFF";
+      }
+    }
+    return currentEstados;
   }
 
   getTextNivel(nivel: string): string {    
